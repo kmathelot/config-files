@@ -2,7 +2,7 @@ local awful = require("awful")
 local gears = require("gears")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
-local modkey = user_vars.modkey
+local modkey = user.modkey
 
 
 -- {{{ Key bindings
@@ -48,7 +48,7 @@ globalkeys = gears.table.join(
         { description = "go back", group = "client" }),
 
     -- Standard program
-    awful.key({ modkey, }, "Return", function() awful.spawn(user_vars.terminal) end,
+    awful.key({ modkey, }, "Return", function() awful.spawn(user.terminal) end,
         { description = "open a terminal", group = "launcher" }),
     awful.key({ modkey, "Control" }, "r", awesome.restart,
         { description = "reload awesome", group = "awesome" }),

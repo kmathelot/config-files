@@ -1,9 +1,6 @@
 ---------------------------
 -- Default awesome theme --
 ---------------------------
-local awful = require("awful")
-local beautiful = require("beautiful")
-local gears = require("gears")
 
 local theme_assets = require("beautiful.theme_assets")
 local xresources = require("beautiful.xresources")
@@ -14,7 +11,7 @@ local themes_path = gfs.get_themes_dir()
 
 local theme = {}
 
-theme.font          = "FiraCode Nerd Font Mono 8"
+theme.font          = "sans 8"
 
 theme.bg_normal     = "#222222"
 theme.bg_focus      = "#535d6c"
@@ -27,7 +24,7 @@ theme.fg_focus      = "#ffffff"
 theme.fg_urgent     = "#ffffff"
 theme.fg_minimize   = "#ffffff"
 
-theme.useless_gap   = dpi(4)
+theme.useless_gap   = dpi(0)
 theme.border_width  = dpi(1)
 theme.border_normal = "#000000"
 theme.border_focus  = "#535d6c"
@@ -129,7 +126,6 @@ theme.awesome_icon = theme_assets.awesome_icon(
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.
 theme.icon_theme = nil
 
--- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=8:softtabstop=4:textwidth=80
+return theme
 
--- Themes define colours, icons, font and wallpapers.
-beautiful.init(theme)
+-- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=8:softtabstop=4:textwidth=80

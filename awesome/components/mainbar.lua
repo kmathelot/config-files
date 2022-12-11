@@ -6,14 +6,16 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- Widget and layout library
 local wibox = require("wibox")
 
+local volume_widget = require("awesome-wm-widgets.volume-widget.volume")
+
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 
 
-local modkey = user_vars.modkey
-local terminal = user_vars.terminal
-local editor_cmd = terminal .. " -e " .. user_vars.editor
+local modkey = user.modkey
+local terminal = user.terminal
+local editor_cmd = terminal .. " -e " .. user.editor
 
 -- {{{ Menu
 -- Create a launcher widget and a main menu
@@ -39,6 +41,9 @@ mykeyboardlayout = awful.widget.keyboardlayout()
 -- {{{ Wibar
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
+
+praisewidget = wibox.widget.textbox()
+praisewidget.text = " You are great! "
 
 -- Create a wibox for each screen and add it
 -- Create a wibox for each screen and add it
@@ -100,8 +105,6 @@ awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
-    awful.layout.layouts = user_vars.layouts
-
     -- Each screen has its own tag table.
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
@@ -139,12 +142,14 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             mylauncher,
             s.mytaglist,
+            praisewidget,
             s.mypromptbox,
         },
         s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             mykeyboardlayout,
+            volume_widget(),
             wibox.widget.systray(),
             mytextclock,
             s.mylayoutbox,

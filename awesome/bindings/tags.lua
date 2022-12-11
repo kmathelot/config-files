@@ -1,7 +1,7 @@
 local awful = require("awful")
 local gears = require("gears")
 
-local modkey = user_vars.modkey
+local modkey = user.modkey
 
 -- Bind all key numbers to tags.
 -- Be careful: we use keycodes to make it work on any keyboard layout.
