@@ -2,14 +2,15 @@ local awful = require("awful")
 local gears = require("gears")
 local menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup")
+-- local tasklist = require("components.widgets.tasklist")
 local modkey = user.modkey
-
+local altkey = "Mod1"
 
 -- {{{ Key bindings
 globalkeys = gears.table.join(
     awful.key({ modkey, }, "s", hotkeys_popup.show_help, { description = "show help", group = "awesome" }),
-    awful.key({ modkey, }, "Left", awful.tag.viewprev, { description = "view previous", group = "tag" }),
-    awful.key({ modkey, }, "Right", awful.tag.viewnext, { description = "view next", group = "tag" }),
+    -- awful.key({ modkey, }, "Left", awful.tag.viewprev, { description = "view previous", group = "tag" }),
+    -- awful.key({ modkey, }, "Right", awful.tag.viewnext, { description = "view next", group = "tag" }),
     awful.key({ modkey, }, "Escape", awful.tag.history.restore, { description = "go back", group = "tag" }),
 
     awful.key({ modkey, }, "j",
@@ -26,6 +27,15 @@ globalkeys = gears.table.join(
     ),
     awful.key({ modkey, }, "w", function() mymainmenu:show() end,
         { description = "show main menu", group = "awesome" }),
+
+    -- TODO : Construct the list of open clients
+    awful.key({ altkey, }, "Tab", 
+        function() 
+            awful.menu.client_list({ theme = { width = 250 } }):show()
+            -- tasklist.mytasklist:show()
+        end,
+        { description = "Switch into clients", group = "client" }
+    ),
 
     -- Layout manipulation
     awful.key({ modkey, "Shift" }, "j", function() awful.client.swap.byidx(1) end,
@@ -47,9 +57,35 @@ globalkeys = gears.table.join(
         end,
         { description = "go back", group = "client" }),
 
+    -- Focus client by direction (arrow keys)
+    awful.key({ modkey }, "Down",
+    function()
+        awful.client.focus.bydirection("down")
+    end,
+    {description = "focus down", group = "client"}),
+    awful.key({ modkey }, "Up",
+    function()
+        awful.client.focus.bydirection("up")
+    end,
+    {description = "focus up", group = "client"}),
+    awful.key({ modkey }, "Left",
+    function()
+        awful.client.focus.bydirection("left")
+    end,
+    {description = "focus left", group = "client"}),
+    awful.key({ modkey }, "Right",
+    function()
+        awful.client.focus.byidx(1)
+    end,
+    {description = "focus right", group = "client"}),
+
+
     -- Standard program
     awful.key({ modkey, }, "Return", function() awful.spawn(user.terminal) end,
         { description = "open a terminal", group = "launcher" }),
+
+    awful.key({ modkey }, "c", function() awful.spawn("/opt/codium/bin/codium") end, { description = "Open codium", group = "launcher"}),
+
     awful.key({ modkey, "Control" }, "r", awesome.restart,
         { description = "reload awesome", group = "awesome" }),
     awful.key({ modkey, "Shift" }, "q", awesome.quit,

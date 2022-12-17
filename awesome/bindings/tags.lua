@@ -1,5 +1,6 @@
 local awful = require("awful")
 local gears = require("gears")
+local naughty = require("naughty")
 
 local modkey = user.modkey
 
@@ -13,6 +14,10 @@ for i = 1, 9 do
       function()
         local screen = awful.screen.focused()
         local tag = screen.tags[i]
+
+        -- Force screen focus
+        awful.screen.focus(screen)
+        
         if tag then
           tag:view_only()
         end

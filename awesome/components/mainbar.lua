@@ -2,11 +2,28 @@ local awful = require("awful")
 local beautiful = require("beautiful")
 local gears = require("gears")
 local hotkeys_popup = require("awful.hotkeys_popup")
+local lain = require("lain")
 
 -- Widget and layout library
 local wibox = require("wibox")
 
 local volume_widget = require("awesome-wm-widgets.volume-widget.volume")
+
+local volume = lain.widget.pulse {
+    settings = function()
+        vlevel = volume_now.left .. "-" .. volume_now.right .. "% | " .. volume_now.device
+        if volume_now.muted == "yes" then
+            vlevel = vlevel .. " M"
+        end
+        widget:set_markup(lain.util.markup("#7493d2", vlevel))
+    end
+}
+
+local cpu = lain.widget.cpu {
+    settings = function()
+        widget:set_markup("Cpu " .. cpu_now.usage)
+    end
+}
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
@@ -38,12 +55,18 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 -- Keyboard map indicator and switcher
 mykeyboardlayout = awful.widget.keyboardlayout()
 
+-- Create item separator
+textseparator = wibox.widget.textbox()
+textseparator.text = " |"
+
+local w = wibox.widget {
+    orientation = 'vertical',
+    widget = wibox.widget.separator,
+}
+
 -- {{{ Wibar
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
-
-praisewidget = wibox.widget.textbox()
-praisewidget.text = " You are great! "
 
 -- Create a wibox for each screen and add it
 -- Create a wibox for each screen and add it
@@ -105,8 +128,46 @@ awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
+    awful.popup {
+        widget = awful.widget.tasklist {
+            screen   = screen[1],
+            filter   = awful.widget.tasklist.filter.allscreen,
+            buttons  = tasklist_buttons,
+            style    = {
+                shape = gears.shape.rounded_rect,
+            },
+            layout   = {
+                spacing = 5,
+                forced_num_rows = 2,
+                layout = wibox.layout.grid.horizontal
+            },
+            widget_template = {
+                {
+                    {
+                        id     = 'clienticon',
+                        widget = awful.widget.clienticon,
+                    },
+                    margins = 4,
+                    widget  = wibox.container.margin,
+                },
+                id              = 'background_role',
+                forced_width    = 48,
+                forced_height   = 48,
+                widget          = wibox.container.background,
+                create_callback = function(self, c, index, objects) --luacheck: no unused
+                    self:get_children_by_id('clienticon')[1].client = c
+                end,
+            },
+        },
+        border_color = '#777777',
+        border_width = 2,
+        ontop        = false,
+        placement    = awful.placement.centered,
+        shape        = gears.shape.rounded_rect
+    }
+
     -- Each screen has its own tag table.
-    awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
+    awful.tag({ "爵 www", " term", " dev", " medias", " files", " games", " " }, s, awful.layout.layouts[1])
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -132,6 +193,51 @@ awful.screen.connect_for_each_screen(function(s)
         buttons = tasklist_buttons
     }
 
+    s.mytasklist1 = awful.widget.tasklist {
+        screen   = s,
+        filter   = awful.widget.tasklist.filter.currenttags,
+        buttons  = tasklist_buttons,
+        layout   = {
+            spacing_widget = {
+                {
+                    forced_width  = 5,
+                    forced_height = 24,
+                    thickness     = 1,
+                    color         = '#777777',
+                    widget        = wibox.widget.separator
+                },
+                valign = 'center',
+                halign = 'center',
+                widget = wibox.container.place,
+            },
+            spacing = 1,
+            layout  = wibox.layout.fixed.horizontal
+        },
+        -- Notice that there is *NO* wibox.wibox prefix, it is a template,
+        -- not a widget instance.
+        widget_template = {
+            {
+                wibox.widget.base.make_widget(),
+                forced_height = 5,
+                id            = 'background_role',
+                widget        = wibox.container.background,
+            },
+            {
+                {
+                    id     = 'clienticon',
+                    widget = awful.widget.clienticon,
+                },
+                margins = 5,
+                widget  = wibox.container.margin
+            },
+            nil,
+            create_callback = function(self, c, index, objects) --luacheck: no unused args
+                self:get_children_by_id('clienticon')[1].client = c
+            end,
+            layout = wibox.layout.align.vertical,
+        },
+    }
+
     -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s })
 
@@ -140,18 +246,21 @@ awful.screen.connect_for_each_screen(function(s)
         layout = wibox.layout.align.horizontal,
         { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
-            mylauncher,
             s.mytaglist,
-            praisewidget,
             s.mypromptbox,
         },
-        s.mytasklist, -- Middle widget
+        nil, -- Middle widget,
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
-            mykeyboardlayout,
             volume_widget(),
-            wibox.widget.systray(),
+            textseparator,
+            cpu.widget,
+            textseparator,
+            mykeyboardlayout,
+            textseparator,
             mytextclock,
+            textseparator,
+            wibox.widget.systray(),
             s.mylayoutbox,
         },
     }
